@@ -44,33 +44,63 @@ html {
 /*好了， 我们不玩啦 */
 /* 接下来，我们准备一张白纸介绍一下自己吧*/
 `
-var n = 0
-var id = setInterval (() => {
-  n += 1
-  code.innerHTML = result.substring(0, n)
-  code.innerHTML = Prism.highlight(code.innerHTML, Prism.languages.css)
-  // code.innerHTML = code.innerHTML.replace('html', '<span style="color: red;">html</span>')
-  styleTag.innerHTML = result.substring(0, n)
-  if (n >= result.length) {
-      window.clearInterval(id)
-      fn2()
-      fn3(result)
-    }
-}, 10)
+var result2 = `
+#paper{
+    width: 100px; 
+    height: 100px;
+    background: red;
+}
+`
+/**
+ * 把code写到 #code和style标签里面
+ * @param {*前缀} prefix 
+ * @param {*要写进去的代码} code 
+ * @param {*函数} fn 
+ */
+function writeCode(prefix, code, fn) {
+    let domCode = document.querySelector('#code')
+    domCode.innerHTML = prefix || ''
+    let n = 0
+    console.log('设置闹钟')
+    let id = setInterval(() => {
+        n += 1
+        console.log('开始写代码')
+        domCode.innerHTML = Prism.highlight(prefix + code.substring(0, n), Prism.languages.css)
+        styleTag.innerHTML = prefix + code.substring(0, n)
+        domCode.scrollTop = domCode.scrollHeight//保证代码一定会看得到
+        if (n >= code.length) {
+           window.clearInterval(id)
+           fn.call()
+        }
+    }, 10)
+}
 
-function fn2() {
+writeCode('', result, () => { //write去calla这个function
+    createPaper(() => {
+        writeCode(result, result2)
+    })
+})
+
+/* 
+    异步的setInterval
+    1. 定闹钟
+    2. writeCode返回
+    3. 执行fn2()
+    4. 闹钟时间到
+    5. 写第一行代码
+
+    就好像 你先定了第二天6点闹钟，然后玩游戏。肯定是先玩游戏
+*/
+
+function createPaper(fn) {
     var paper = document.createElement('div')
     paper.id = 'paper'
     document.body.appendChild(paper)
+    fn.call()
 }
+
 function fn3(preResult) {
-    var result = `
-    #paper{
-        width: 100px; 
-        height: 100px;
-        background: red;
-    }
-    `
+   
     var n = 0
     var id = setInterval(() => {
         n += 1
